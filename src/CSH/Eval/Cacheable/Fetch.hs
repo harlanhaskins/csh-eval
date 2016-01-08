@@ -21,6 +21,7 @@ module CSH.Eval.Cacheable.Fetch (
   , getMemberUsername
   , getMembersCommonname
   , getMembersOnfloor
+  , getMembers
     -- ** Event
   , getEventID
   , getEventsTitle
@@ -185,6 +186,10 @@ getMemberUsername u c = liftMaybeQ (getMemberUsernameP u) (noSuchThing "member" 
 getMembersCommonname :: T.Text -- ^ Member common name.
                      -> Cacheable [Member]
 getMembersCommonname cn c = liftListQ (getMembersCommonnameP cn) memberFromRow c
+
+-- | Fetch all 'Member's.
+getMembers :: Cacheable [Member]
+getMembers c = liftListQ getMembersP memberFromRow c
 
 -- | Fetch all on-floor or off-floor 'Member's.
 getMembersOnfloor :: Bool -- ^ Onfloor status.

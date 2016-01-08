@@ -10,14 +10,12 @@
                         <th>Name
                         <th>Housing Points
                         <th>On Floor
-                        <th>Eboard
-                    $forall (usr, name, points, onfloor, eboard) <- dummyMembers
+                    $forall (member, active) <- members
                             <tr>
                                 <td>
-                                    <a href=@{MemberR usr}>
-                                        #{name}
+                                    <a href=@{MemberR ((T.unpack . memberUsername) member)}>
+                                        #{(T.unpack . memberCommonname) member}
                                         <br>
-                                        <span .text-muted .small>#{usr}
-                                <td>#{points}
-                                <td>#{charFor onfloor}
-                                <td>#{charFor eboard}
+                                        <span .text-muted .small>#{(T.unpack . memberUsername) member}
+                                <td>#{memberHousingPoints member}
+                                <td>^{widgetFor (memberOnfloorStatus member)}

@@ -60,7 +60,7 @@ cxCfgSettings cfg = ParamSettings
                 <*> (lookupDefault 5432 cfg "db.port")
                 <*> (lookupDefault "" cfg "db.user")
                 <*> (lookupDefault "" cfg "db.password")
-                <*> (lookupDefault "" cfg "db.dbname")
+                <*> (lookupDefault "" cfg "db.database")
 
 -- | Derive hasql pool settings from configuration.
 poolCfgSettings :: Config -> IO PoolSettings

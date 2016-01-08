@@ -27,23 +27,34 @@ import CSH.Eval.Model
 import CSH.Eval.Frontend.Data
 import qualified Data.Text as T
 import System.Log.Logger
-import Yesod
+import Yesod hiding (Active)
 import Network.HTTP.Types
+import Data.Either.Combinators
+
+hasActiveMembership :: [Membership] -> Bool
+hasActiveMembership [] = False
+hasActiveMembership ((Membership Active _ Nothing _):_) = True
+hasActiveMembership (_:xs) = hasActiveMembership xs
 
 -- | The handler for the members listing page
 getMembersR :: Handler Html
-getMembersR = defaultLayout $(whamletFile "frontend/templates/members/index.hamlet")
+getMembersR = do
+    cache <- getCache <$> getYesod
+    eitherMembers <- execCacheable cache getMembers
+    case eitherMembers of
+        (Left err) -> sendResponseStatus internalServerError500 ("Could not Load members " ++ (show err))
+        (Right memberList) -> do
+            memberships <- mapM (\m -> execCacheable cache (getMemberMemberships (memberID m))) memberList
+            let members = filter (hasActiveMembership . fromRight [] . snd) $ zip memberList memberships
+            defaultLayout $(whamletFile "frontend/templates/members/index.hamlet")
 
-dummyMembers :: [(String, String, Int, Bool, Bool)]
-dummyMembers = take 100 . cycle $ 
-               [("harlan", "Harlan Haskins", 4, True, True)
-               ,("dag10", "Drew Gottlieb", 4, True, False)
-               ,("tmobile", "Travis Whitaker", 8, True, False)
-               ]
-
-charFor :: Bool -> T.Text
-charFor True = "✅"
-charFor False = "❌"
+widgetFor :: Bool -> Widget
+widgetFor True = [whamlet|
+    <span .glyphicon .glyphicon-ok>
+|]
+widgetFor False = [whamlet|
+    <span .glyphicon .glyphicon-remove>
+|]
 
 -- | The handler for a single member's page
 getMemberR :: String -> Handler Html

@@ -60,6 +60,10 @@ getMembersCommonnameP :: T.Text -- ^ Common name
                       -> H.Stmt HP.Postgres
 getMembersCommonnameP = [H.stmt|select * from "member" where "commonname" = ?|]
 
+-- | Fetch all members.
+getMembersP :: H.Stmt HP.Postgres
+getMembersP = [H.stmt|select * from "member"|]
+
 -- | Fetch all members with the given on floor status.
 getMembersOnfloorP :: Bool -- ^ On floor status
                    -> H.Stmt HP.Postgres
